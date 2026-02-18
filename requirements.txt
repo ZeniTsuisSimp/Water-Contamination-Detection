@@ -2,10 +2,5 @@ pandas
 numpy
 scikit-learn
 streamlit
-jupyter
 matplotlib
 seaborn
-streamlit
-scikit-learn
-numpy
-pandas

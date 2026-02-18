@@ -1,0 +1,46 @@
+# Version control
+.git
+.github
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+env/
+venv/
+.venv/
+
+# Jupyter
+.ipynb_checkpoints
+*.ipynb
+
+# Dataset (not needed at runtime, model is pre-trained)
+Dataset/
+
+# IDE / editor
+.vscode/
+.idea/
+
+# Test / CI artifacts
+.pytest_cache
+.coverage
+coverage.xml
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dev scripts (not needed in production)
+add_noise.py
+check_accuracy.py
+inspect_tds.py
+investigate_overfitting.py
+train_temp.py
+verify_accuracy.py
+investigation_results.txt
+verification_results.txt
+separation_check.png
+docker-compose.yml
