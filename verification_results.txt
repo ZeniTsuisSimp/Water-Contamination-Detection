@@ -1,0 +1,3 @@
+Training Accuracy: 100.00%
+Testing Accuracy: 82.08%
+WARNING: High training accuracy but lower testing accuracy indicates Overfitting.
