@@ -101,5 +101,15 @@ jobs:
           git config --global user.email "ci-bot@github.com"
           git config --global user.name "CI Bot"
 
+          # Install and configure Git LFS (required for binary files on HF)
+          git lfs install
+
+          # Track model files with LFS
+          git lfs track "*.pkl"
+
+          # Commit LFS changes if any
+          git add .gitattributes
+          git diff --cached --quiet || git commit -m "Configure Git LFS for model files"
+
           git remote add hf https://user:${HF_TOKEN}@huggingface.co/spaces/${{ secrets.HF_USERNAME }}/${{ secrets.HF_SPACE_NAME }}
           git push hf main --force
