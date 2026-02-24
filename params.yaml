@@ -6,9 +6,9 @@ data:
 
 features:
   names:
-    - ph
-    - Solids
-  target: Potability
+    - pH
+    - TDS
+  target: Classification
 
 model:
   rf:

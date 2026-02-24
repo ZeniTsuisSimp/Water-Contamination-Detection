@@ -1,8 +1,13 @@
+import sys
+import os
+
+# Ensure project root is on the path so `src` package is importable
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
 import streamlit as st
 import numpy as np
 import pandas as pd
 import pickle
-import os
 import time
 import altair as alt
 

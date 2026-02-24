@@ -30,8 +30,16 @@ def load_data(data_path):
 def preprocess(df, features, target):
     """
     Impute missing values and return clean X, y arrays.
+    Handles text labels (Safe/Unsafe) by encoding to binary (1/0).
     Returns: X (DataFrame), y (Series), imputer (fitted SimpleImputer)
     """
+    # Encode text labels to binary if needed
+    if df[target].dtype == "object":
+        # Drop Unknown/ambiguous labels
+        df = df[df[target].isin(["Safe", "Unsafe"])].copy()
+        df[target] = df[target].map({"Safe": 1, "Unsafe": 0})
+        print(f"Encoded '{target}': Safe→1, Unsafe→0 ({len(df)} samples after filtering)")
+
     imputer = SimpleImputer(strategy="mean")
     df_imputed = pd.DataFrame(
         imputer.fit_transform(df[features]), columns=features
