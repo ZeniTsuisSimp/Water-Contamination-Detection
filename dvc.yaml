@@ -1,0 +1,39 @@
+stages:
+  preprocess:
+    cmd: python -m src.data_preprocessing
+    deps:
+      - data/processed/water_classified_fixed.csv
+      - src/data_preprocessing.py
+    params:
+      - data
+      - features
+    outs:
+      - reports/data_summary.json:
+          cache: false
+
+  train:
+    cmd: python -m src.train
+    deps:
+      - src/train.py
+      - src/data_preprocessing.py
+    params:
+      - model
+      - features
+      - data
+    outs:
+      - water_model.pkl
+    metrics:
+      - reports/metrics.json:
+          cache: false
+
+  evaluate:
+    cmd: python -m src.evaluate
+    deps:
+      - water_model.pkl
+      - src/evaluate.py
+    metrics:
+      - reports/eval_metrics.json:
+          cache: false
+    plots:
+      - reports/confusion_matrix.png:
+          cache: false

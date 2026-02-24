@@ -5,6 +5,4 @@ streamlit
 matplotlib
 seaborn
 pyyaml
-mlflow
-dvc
 altair

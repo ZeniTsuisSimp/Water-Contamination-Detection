@@ -1,46 +1,35 @@
-# Version control
-.git
-.github
-
-# Python cache
-__pycache__
-*.pyc
-*.pyo
-*.pyd
-
-# Virtual environments
-env/
+# Ignore virtual environments
 venv/
 .venv/
 
-# Jupyter
-.ipynb_checkpoints
-*.ipynb
+# Ignore Python caches
+__pycache__/
+*.pyc
 
-# Dataset (not needed at runtime, model is pre-trained)
-Dataset/
+# Ignore Git internals
+.git/
+.github/
 
-# IDE / editor
-.vscode/
+# Ignore MLflow runs
+mlruns/
+
+# Ignore IDE files
 .idea/
+.vscode/
 
-# Test / CI artifacts
-.pytest_cache
-.coverage
-coverage.xml
+# Ignore raw data (keep processed for Docker)
+data/raw/
 
-# OS files
-.DS_Store
-Thumbs.db
+# Ignore notebooks (not needed in container)
+notebooks/
 
-# Dev scripts (not needed in production)
-add_noise.py
-check_accuracy.py
-inspect_tds.py
-investigate_overfitting.py
-train_temp.py
-verify_accuracy.py
-investigation_results.txt
-verification_results.txt
-separation_check.png
-docker-compose.yml
+# Ignore DVC files
+.dvc/
+*.dvc
+
+# Ignore reports (generated at runtime)
+reports/
+
+# Ignore temp/investigation files
+*.tmp
+*.log

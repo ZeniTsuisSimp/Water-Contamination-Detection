@@ -1,0 +1,17 @@
+# Ignore virtual environments
+venv/
+.venv/
+
+# Ignore Python caches
+__pycache__/
+*.pyc
+
+# Ignore Git internals
+.git/
+
+# Ignore MLflow runs
+mlruns/
+
+# Ignore IDE files
+.idea/
+.vscode/
