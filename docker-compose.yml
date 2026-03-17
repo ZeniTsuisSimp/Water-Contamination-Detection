@@ -1,9 +1,9 @@
 version: "3.8"
 
 services:
-  water-quality-app:
+  water-contamination-detection:
     build: .
-    container_name: water_quality_monitor
+    container_name: water_contamination_detection
     ports:
       - "8501:8501" # Access at http://localhost:8501
     volumes:

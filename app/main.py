@@ -13,7 +13,7 @@ import altair as alt
 
 # Set page configuration
 st.set_page_config(
-    page_title="Water Quality Monitoring",
+    page_title="Water Contamination Detection",
     page_icon="💧",
     layout="centered"
 )
