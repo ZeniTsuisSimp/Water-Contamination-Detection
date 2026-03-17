@@ -94,7 +94,7 @@ st.sidebar.header("Configuration")
 model_choice = st.sidebar.selectbox("Choose Model", ["Random Forest", "SVM"])
 
 # --- Main Interface ---
-st.title("💧 AI-Based Water Quality Monitoring")
+st.title("💧 Water Contamination Detection")
 st.markdown("Real-time monitoring using **Hybrid Logic** (AI + Safety Rules).")
 
 if bundle is None:
