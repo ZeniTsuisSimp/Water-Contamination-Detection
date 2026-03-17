@@ -1,5 +1,5 @@
 ---
-title: Water Quality Monitor
+title: Water Contamination Detection
 emoji: 💧
 colorFrom: blue
 colorTo: indigo
