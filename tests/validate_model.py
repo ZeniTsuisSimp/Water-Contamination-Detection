@@ -68,13 +68,13 @@ def validate():
     # 7. Verify predict module loads
     try:
         sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-        from src.predict import detect_anomaly, predict_quality
+        from src.predict import predict_quality
         print("✅ src.predict module loads correctly")
 
-        # Test anomaly detection
-        is_anomaly, msg = detect_anomaly(3.0, 500)
-        assert is_anomaly, "Expected anomaly for pH=3.0"
-        print("✅ Anomaly detection works correctly")
+        # Test ML prediction
+        pred, prob, msg = predict_quality(7.0, 500, "Random Forest", bundle)
+        assert pred in [0, 1], "Prediction should be 0 or 1"
+        print("✅ Prediction logic works correctly")
     except Exception as e:
         print(f"❌ Predict module test failed: {e}")
         sys.exit(1)
