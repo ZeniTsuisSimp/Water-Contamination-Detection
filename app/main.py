@@ -10,6 +10,7 @@ import pandas as pd
 import pickle
 import time
 import altair as alt
+from twilio.rest import Client
 
 # Set page configuration
 st.set_page_config(
@@ -86,8 +87,41 @@ def load_model_bundle():
 
 bundle = load_model_bundle()
 
+# --- Twilio SMS Setup ---
+def send_sms_alert(message):
+    """Sends an SMS alert using Twilio if credentials exist."""
+    try:
+        # Load from st.secrets if available, fallback to os.environ
+        # Make sure to set these up in .streamlit/secrets.toml
+        try:
+            account_sid = st.secrets["TWILIO_ACCOUNT_SID"]
+            auth_token = st.secrets["TWILIO_AUTH_TOKEN"]
+            from_number = st.secrets["TWILIO_FROM_NUMBER"]
+            to_number = st.secrets["TWILIO_TO_NUMBER"]
+        except Exception:
+            account_sid = os.environ.get("TWILIO_ACCOUNT_SID")
+            auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
+            from_number = os.environ.get("TWILIO_FROM_NUMBER")
+            to_number = os.environ.get("TWILIO_TO_NUMBER")
+            
+        if not all([account_sid, auth_token, from_number, to_number]):
+            return False, "Twilio configuration missing. Check .streamlit/secrets.toml."
+            
+        client = Client(account_sid, auth_token)
+        msg = client.messages.create(
+            body=message,
+            from_=from_number,
+            to=to_number
+        )
+        return True, msg.sid
+    except Exception as e:
+        return False, str(e)
+
 # --- Import prediction logic from src package ---
-from src.predict import detect_anomaly, predict_quality
+import importlib
+import src.predict
+importlib.reload(src.predict)
+from src.predict import predict_quality
 
 # --- Sidebar: Model Selection ---
 st.sidebar.header("Configuration")
@@ -95,7 +129,7 @@ model_choice = st.sidebar.selectbox("Choose Model", ["Random Forest", "SVM"])
 
 # --- Main Interface ---
 st.title("💧 Water Contamination Detection")
-st.markdown("Real-time monitoring using **Hybrid Logic** (AI + Safety Rules).")
+st.markdown("Real-time water quality monitoring powered by **Machine Learning**.")
 
 if bundle is None:
     st.error("⚠️ Model file not found! Please run `python -m src.train` first.")
@@ -111,7 +145,7 @@ else:
 
     # --- Prediction Logic ---
     if st.button("Analyze Quality", type="primary"):
-        prediction, probability, reason, is_anomaly = predict_quality(ph, solids, model_choice, bundle)
+        prediction, probability, reason = predict_quality(ph, solids, model_choice, bundle)
 
         # Display Results
         st.markdown("---")
@@ -132,12 +166,12 @@ else:
                     <p>Confidence: {1-probability:.1%}</p>
                 </div>
             ''', unsafe_allow_html=True)
-            if is_anomaly:
-                st.markdown(beep_audio, unsafe_allow_html=True)
 
 # --- Real-Time Simulation Section ---
 st.markdown("---")
 st.subheader("📡 Real-Time Simulation Monitoring")
+
+enable_sms = st.checkbox("📱 Enable SMS Alerts for Contamination Events")
 
 if 'simulation' not in st.session_state:
     st.session_state.simulation = False
@@ -163,6 +197,10 @@ if st.session_state.simulation:
     # Initialize contamination state if not present
     if 'contamination_steps' not in st.session_state:
         st.session_state.contamination_steps = 0
+        
+    # Track SMS so we only send 1 text per event (avoids spamming cell phone once per second!)
+    if 'alert_sent_for_current_event' not in st.session_state:
+        st.session_state.alert_sent_for_current_event = False
 
     # Simulation Loop
     while st.session_state.simulation:
@@ -204,25 +242,31 @@ if st.session_state.simulation:
             m1.metric("pH Level", f"{sim_ph:.2f}")
             m2.metric("TDS Level", f"{sim_tds:.0f} ppm")
 
-            # Predict status (Hybrid Logic)
+            # Predict status (ML Model)
             if bundle:
-                sim_pred, _, _, sim_anomaly = predict_quality(sim_ph, sim_tds, model_choice, bundle)
+                sim_pred, sim_prob, _ = predict_quality(sim_ph, sim_tds, model_choice, bundle)
 
-                if sim_anomaly:
-                    status_text = "CRITICAL UNSAFE"
-                    status_color = "inverse"
-                else:
-                    status_text = "Safe" if sim_pred == 1 else "Unsafe"
-                    status_color = "normal" if sim_pred == 1 else "off"
+                status_text = "Safe" if sim_pred == 1 else "Unsafe"
+                status_color = "normal" if sim_pred == 1 else "off"
 
                 m3.metric("Status", status_text, delta_color=status_color)
 
-                # Show error message if critical
-                is_anomaly, anomaly_msg = detect_anomaly(sim_ph, sim_tds)
-                if is_anomaly:
-                    st.error(f"🚨 {anomaly_msg}")
-                elif sim_pred == 0:
-                    st.warning("⚠️ Contamination Detected")
+                if sim_pred == 0:
+                    st.warning(f"⚠️ Contamination Detected (Confidence: {1-sim_prob:.1%})")
+                    
+                    # Fire SMS Alert if enabled
+                    if enable_sms and not st.session_state.alert_sent_for_current_event:
+                        alert_msg = f"🚨 WATER ALERT: Contamination detected!\npH Level: {sim_ph:.2f}\nTDS (Solids): {sim_tds:.0f} ppm\nModel Confidence: {1-sim_prob:.1%}"
+                        success, detail = send_sms_alert(alert_msg)
+                        if success:
+                            st.success("✅ SMS Alert sent successfully!")
+                        else:
+                            st.error(f"❌ Failed to send SMS: {detail}")
+                        # Mark as sent so we don't spam 
+                        st.session_state.alert_sent_for_current_event = True
+                else:
+                    # Reset SMS flag when simulation returns to Safe state
+                    st.session_state.alert_sent_for_current_event = False
 
             # 2. Altair Charts
             data = st.session_state.data_log.reset_index()

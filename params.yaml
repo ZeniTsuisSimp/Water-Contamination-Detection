@@ -23,11 +23,6 @@ noise:
   ph_std: 1.5
   tds_std: 80.0
 
-anomaly:
-  ph_critical_low: 4.0
-  ph_critical_high: 10.0
-  tds_critical_high: 3000
-
 output:
   model_path: water_model.pkl
   metrics_path: reports/metrics.json
