@@ -35,11 +35,8 @@ def predict_quality(ph, tds, model_choice, bundle):
         prediction = model.predict(input_scaled)[0]
         probability = model.predict_proba(input_scaled)[0][1]
 
-    # Smooth out perfect probabilities for realism
-    if probability > 0.99:
-        probability = np.random.uniform(0.95, 0.99)
-    elif probability < 0.01:
-        probability = np.random.uniform(0.01, 0.05)
+    # Use exact probability instead of artificial smoothing
+    # (Removed np.random.uniform smoothing to keep confidences consistent)
 
     reason = f"Model Prediction: {model_choice}"
 
