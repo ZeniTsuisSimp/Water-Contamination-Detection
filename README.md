@@ -12,6 +12,10 @@ pinned: false
 
 AI-powered water quality monitoring system using **IoT sensor data**, **Machine Learning**, **Docker**, and **CI/CD** — built with a professional MLOps pipeline.
 
+## 🔗 Live Project
+
+- Hugging Face Spaces: https://huggingface.co/spaces/ZeniTsuisSimp/Water-Contamination-Detection
+
 ## 🏗️ Project Structure
 
 ```
@@ -61,7 +65,7 @@ pip install -r requirements.txt
 ```bash
 python -m src.train
 ```
-This trains RF + SVM models, logs to MLflow, and saves `water_model.pkl`.
+This trains the model, logs to MLflow, and saves `water_model.pkl`.
 
 ### 3. Evaluate
 ```bash
@@ -106,13 +110,13 @@ All hyperparameters and thresholds are in [`params.yaml`](params.yaml):
 
 - **Data paths** — raw/processed data locations
 - **Feature names** — pH, Solids (TDS)
-- **Model hyperparameters** — RF trees, SVM kernel
+- **Model hyperparameters** — RF trees
 - **Anomaly thresholds** — critical pH/TDS limits
 
 ## 🧠 Hybrid Prediction Logic
 
 1. **Rule-Based Safety Check** — Catches critical anomalies (pH < 4 or > 10, TDS > 3000)
-2. **ML Model** — Random Forest or SVM predicts potability for non-critical inputs
+2. **ML Model** — Random Forest predicts potability for non-critical inputs
 3. **Confidence Smoothing** — Prevents unrealistic 100%/0% probabilities
 
 ## 🚢 CI/CD Pipeline
@@ -125,7 +129,7 @@ All hyperparameters and thresholds are in [`params.yaml`](params.yaml):
 
 ## 📊 Tech Stack
 
-- **ML**: scikit-learn (Random Forest, SVM)
+- **ML**: scikit-learn (Random Forest)
 - **App**: Streamlit + Altair charts
 - **Experiment Tracking**: MLflow
 - **Data Versioning**: DVC
